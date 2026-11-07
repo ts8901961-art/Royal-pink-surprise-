@@ -11,6 +11,7 @@ const countEl = document.getElementById('questionCount');
 const feedbackEl = document.getElementById('feedback');
 const progressEl = document.getElementById('progressBar');
 const nextButton = document.getElementById('nextButton');
+const quiz = document.getElementById('quiz');
 function normalize(value) { return value.toLowerCase().trim().replace(/[.!?']/g, '').replace(/\s+/g, ' '); }
 function renderQuestion() {
   const q = questions[current];
@@ -23,21 +24,38 @@ function renderQuestion() {
   nextButton.textContent = current === 2 ? 'Reveal my surprise ✨' : 'Unlock next 💌';
   answerEl.focus({preventScroll:true});
 }
+document.getElementById('startButton').addEventListener('click', event => {
+  event.preventDefault();
+  quiz.classList.remove('locked');
+  quiz.scrollIntoView({behavior:'smooth'});
+  answerEl.focus({preventScroll:true});
+});
 nextButton.addEventListener('click', () => {
   const typed = normalize(answerEl.value);
-  if (!typed) { feedbackEl.textContent = 'Write your answer first, lovely. 💗'; return; }
+  if (!typed) { feedbackEl.textContent = 'Write your answer first. 💗'; return; }
   if (!questions[current].answers.includes(typed)) { feedbackEl.textContent = 'Not quite! Try once more. You know our little story. 💕'; return; }
-  if (current < questions.length - 1) { current++; renderQuestion(); }
-  else {
-    document.getElementById('letter').scrollIntoView({behavior:'smooth'});
-    feedbackEl.textContent = 'You unlocked it! Every word is for you. ❤️';
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+    quiz.scrollIntoView({behavior:'smooth'});
+  } else {
+    document.getElementById('letter').classList.remove('locked');
+    document.getElementById('memories').classList.remove('locked');
+    document.getElementById('forever').classList.remove('locked');
+    feedbackEl.textContent = 'You unlocked every surprise! Every word is for you. ❤️';
     nextButton.textContent = 'Unlocked 💖';
     nextButton.disabled = true;
+    document.getElementById('letter').scrollIntoView({behavior:'smooth'});
   }
 });
 answerEl.addEventListener('keydown', e => { if (e.key === 'Enter') nextButton.click(); });
 document.getElementById('replayButton').addEventListener('click', () => {
-  current = 0; nextButton.disabled = false; renderQuestion();
-  document.getElementById('quiz').scrollIntoView({behavior:'smooth'});
+  current = 0;
+  nextButton.disabled = false;
+  document.getElementById('letter').classList.add('locked');
+  document.getElementById('memories').classList.add('locked');
+  document.getElementById('forever').classList.add('locked');
+  renderQuestion();
+  quiz.scrollIntoView({behavior:'smooth'});
 });
 renderQuestion();
